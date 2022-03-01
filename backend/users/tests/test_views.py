@@ -1,8 +1,9 @@
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
+from rest_framework.authtoken.models import Token
 
-from .utils import make_user
+from .utils import make_user, get_user, get_user_token
 
 
 class TestUserAPI(APITestCase):
