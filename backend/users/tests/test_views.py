@@ -38,3 +38,34 @@ class TestMeAPI(APITestCase):
     def test_does_not_return_information_to_unauthenticated_user(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+class TestRegisterAPI(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = make_user(username="bob")
+        cls.register_url = reverse(viewname="user_register")
+        cls.authtoken_url = reverse(viewname="user_token")
+
+    def test_register_user(self):
+        response = self.client.post(self.register_url, {"username":"bobby", "password" : "pass"})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["username"], "bobby")
+
+    def test_register_does_not_create_superuser_or_staff_user(self):
+        response = self.client.post(self.register_url, {"username":"bobby2", "password" : "pass", "is_superuser" : True, "is_staff" : True})
+        user = get_user(id=response.data['id'])
+        self.assertEqual( getattr(user, 'is_superuser') , False)
+        self.assertEqual(user.is_staff, False)
+
+    def test_user_get_correct_authtoken_by_credentials(self):
+        self.test_register_user()
+        response = self.client.post(self.authtoken_url, {"username":"bobby", "password" : "pass"})
+        t = [response.data["token"] for x in Token.objects.all()]
+        self.assertEqual( response.data["token"] in t, True)
+
+    def test_user_get_no_authtoken_by_wrong_credentials(self):
+        self.test_register_user()
+        response = self.client.post(self.authtoken_url, {"username":"bobby", "password" : "wrong"})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    
