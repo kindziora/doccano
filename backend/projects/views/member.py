@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from projects.exceptions import RoleAlreadyAssignedException, RoleConstraintException
 from projects.models import Member
-from projects.permissions import IsProjectAdmin
+from projects.permissions import IsProjectAdmin, IsProjectMember
 from projects.serializers import MemberSerializer
 
 
@@ -16,7 +16,7 @@ class MemberList(generics.ListCreateAPIView):
     queryset = Member.objects.all()
     serializer_class = MemberSerializer
     pagination_class = None
-    permission_classes = [IsAuthenticated & IsProjectAdmin]
+    permission_classes = [IsAuthenticated & IsProjectMember]
 
     def filter_queryset(self, queryset):
         queryset = queryset.filter(project=self.kwargs["project_id"])
