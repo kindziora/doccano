@@ -8,11 +8,13 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import permissions
 from rest_framework.authtoken.models import Token
+from django.conf import settings
 
+from roles.models import Role
 from .serializers import UserSerializer
+from projects.models import Member
 from projects.permissions import IsProjectAdmin
-
-
+from projects.models import Project 
 class Me(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -45,6 +47,20 @@ class RegisterUser(generics.CreateAPIView):
             token = Token.objects.create(user=user)
             json = serializer.data
             json['token'] = token.key
+
+            print(request.data)
+
+            if request.data['rolename'] == "annotator":
+
+                annotator_role = Role.objects.get(name=settings.ROLE_ANNOTATOR)
+                active_project = Project.objects.get(id=request.data['project'])
+                
+                Member.objects.create(
+                    project=active_project,
+                    user=user,
+                    role=annotator_role,
+                )
+                
             return Response(json, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
