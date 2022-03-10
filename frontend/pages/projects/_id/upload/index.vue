@@ -127,7 +127,7 @@ export default {
         v => !!v || 'Field value is required'
       ],
       server: {
-        url: '/v1/fp',
+        url: '/dcano/v1/fp',
         headers: {
           'X-CSRFToken': Cookies.get('csrftoken'),
         },
