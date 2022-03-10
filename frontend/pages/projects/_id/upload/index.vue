@@ -144,7 +144,7 @@ export default {
       uploadedFiles: [],
       valid: false,
       isImporting: false,
-    }
+    } 
   },
 
   computed: {
